@@ -35,8 +35,8 @@ const runWorker = (data) => {
         // const worker = new Worker(path.join(__dirname, '../helper/workerHelper.js'));
         console.log({ path: path_1.default.join(__dirname, '../dist/workerHelper.js') });
         console.log({ path: path_1.default.join(__dirname, '/dist/helper/workerHelper.js') });
+        console.log({ path: path_1.default.join(__dirname, '/workerHelper.js') }, 'we are here');
         // const worker = new Worker(path.join(__dirname, '../dist/workerHelper.js'));
-        // const worker = new worker_threads_1.Worker(path_1.default.join(__dirname, '/dist/helper/workerHelper.js'));
         const worker = new worker_threads_1.Worker(path_1.default.join(__dirname, '/workerHelper.js'));
         // const worker = new Worker(path.join(__dirname, '../helper/dist/workerHelper.js'));
         worker.postMessage(data);
