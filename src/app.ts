@@ -10,6 +10,10 @@ import { connectDb } from "./config/db";
 import path from "path";
 import crypto from "crypto";
 import { initializeSocket} from './config/socket'
+import { allowedOrigins } from "./config/allowedOrigins";
+import  TaccRoutes   from './Routes/TaccRoutes'
+
+  console.log({path:path.join(__dirname, '../dist/workerHelper.js')})
 
 // console.log("UUID:", crypto.randomUUID());
 // console.log("Random Bytes (hex):", crypto.randomBytes(256).toString("hex"));
@@ -21,7 +25,7 @@ const server = http.createServer(app);
 
 initializeSocket(server)
 const corsConfig = {
-  origin: '*',
+  origin: allowedOrigins,
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE"],
 };
@@ -37,7 +41,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.get("/", (req: Request, res: Response) => {
   res.send("first server!");
 });
-// app.use("/api/auth", authRoutes);
+app.use("/api/", TaccRoutes);
 
 app.use(
   (

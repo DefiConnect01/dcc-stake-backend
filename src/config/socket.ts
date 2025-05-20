@@ -1,6 +1,9 @@
 import { Server, Socket } from "socket.io";
 import { Server as HttpServer } from "http";
-
+import { ITacc } from './../Model/TaccHistory'
+import { allowedOrigins } from "./allowedOrigins";
+import { handleJob } from "../helper/workerQueue";
+import './../utils/taccStatusUpdater'
 const Apikey = process.env.Apikey;
 let io: Server | null = null;
 
@@ -13,7 +16,7 @@ interface AuthenticatedSocket extends Socket {
 export const initializeSocket = (httpServer: HttpServer): void => {
   io = new Server(httpServer, {
     cors: {
-      origin: process.env.CLIENT_URL,
+      origin: allowedOrigins,
       credentials: true,
     },
   });
@@ -41,9 +44,40 @@ export const initializeSocket = (httpServer: HttpServer): void => {
 
   io.on("connection", (socket: Socket) => {
     const authenticatedSocket = socket as AuthenticatedSocket;
+    console.log({ socket: socket.id })
 
     console.log(`User connected with socket id: ${authenticatedSocket.id}`);
     connectedUsers.set(authenticatedSocket.userId, authenticatedSocket.id);
+    //? listen to swap
+    socket.on('stake', async (data) => {
+
+      try {
+        console.log({ data }, 'listening to stake event');
+
+        //? push to worker
+        const savedTx = await handleJob({
+          type: 'TacStake',
+          data: data,
+        });
+        console.log('Saved from worker:', savedTx);
+        //? emit back to frontend transaction successfull
+        io?.emit('stake:confirmation', savedTx);
+       
+
+        console.log('finally back to default')
+      } catch (error) {
+        if (error instanceof Error) {
+          console.error('Error saving transaction via worker:', error);
+          socket.emit('error', { message: error.message || 'Unknown error occurred during staking' });
+        }
+      }
+    })
+
+    //?
+    //? listen to message
+    socket.on("connect_error", (err) => {
+      console.error("Connection Error:", err);
+    });
 
     socket.on("disconnect", () => {
       console.log(

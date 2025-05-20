@@ -47,13 +47,19 @@ const processNextTask = (): void => {
       });
   }
 };
-
+// /Users/mac/Desktop/folly/dev/abundance_server/src/helper/dist/helper/workerHelper.js
 
 const runWorker = (data: JobMessage): Promise<any> => {
   return new Promise((resolve, reject) => {
     activeWorkers++;
 
-    const worker = new Worker(path.join(__dirname, '../helper/workerHelper.ts'));
+    // const worker = new Worker(path.join(__dirname, '../helper/workerHelper.js'));
+    console.log({path:path.join(__dirname, '../dist/workerHelper.js')})
+    console.log({path:path.join(__dirname, '/dist/helper/workerHelper.js')})
+    // const worker = new Worker(path.join(__dirname, '../dist/workerHelper.js'));
+    const worker = new Worker(path.join(__dirname, '/dist/helper/workerHelper.js'));
+    // const worker = new Worker(path.join(__dirname, '../helper/dist/workerHelper.js'));
+
     worker.postMessage(data);
 
     worker.on('message', (result: WorkerResult) => {
