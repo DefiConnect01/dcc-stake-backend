@@ -36,6 +36,7 @@ app.disable("x-powered-by");
 app.set("trust proxy", true);
 app.use(express.json());
 // app.use(express.static("public"));
+//we are
 app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/", (req: Request, res: Response) => {
