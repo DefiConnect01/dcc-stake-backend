@@ -9,5 +9,6 @@ export function fotmatTac(data:ITacc){
             network: data.network,
             hash: data.hash,
             status: data.status,
+            action: data.action,
     }
 }

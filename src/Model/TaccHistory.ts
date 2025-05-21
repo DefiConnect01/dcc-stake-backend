@@ -1,19 +1,27 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Schema, Document, Model } from "mongoose";
 
+// Enums and Types
 export enum IStatus {
     PENDING = "Pending",
     COMPLETED = "Completed",
 }
 
-export type ITacc = {
+export const ACTIONS = ['Stake', 'Unstake'] as const;
+export type IAction = typeof ACTIONS[number];
+
+
+export interface ITacc extends Document {
     address: string;
     token: string;
     amount: string;
     duration: string;
     network: string;
     hash: string;
+    action: IAction;
     status: IStatus;
-};
+    createdAt?: Date;
+    updatedAt?: Date;
+}
 
 const TaccSchema = new Schema<ITacc>(
     {
@@ -23,6 +31,12 @@ const TaccSchema = new Schema<ITacc>(
         duration: { required: true, type: String },
         network: { required: true, type: String },
         hash: { required: true, type: String },
+        action: {
+            required: true,
+            type: String,
+            enum: ACTIONS,
+            default: ACTIONS[0],
+        },
         status: {
             type: String,
             enum: Object.values(IStatus),
@@ -34,5 +48,6 @@ const TaccSchema = new Schema<ITacc>(
     }
 );
 
-export const TaccHistoryModel =
+
+export const TaccHistoryModel: Model<ITacc> =
     mongoose.models.Tacc || mongoose.model<ITacc>("Tacc", TaccSchema);

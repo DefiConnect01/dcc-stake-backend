@@ -13,7 +13,7 @@ import { initializeSocket} from './config/socket'
 import { allowedOrigins } from "./config/allowedOrigins";
 import  TaccRoutes   from './Routes/TaccRoutes'
 
-  console.log({path:path.join(__dirname, '../dist/workerHelper.js')})
+  // console.log({path:path.join(__dirname, '../dist/workerHelper.js')})
 
 // console.log("UUID:", crypto.randomUUID());
 // console.log("Random Bytes (hex):", crypto.randomBytes(256).toString("hex"));

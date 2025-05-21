@@ -1,0 +1,42 @@
+@PORT = http://localhost:3000/api
+@Json = application/json
+
+
+@token =Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3Y2RiNmY0ZmZmYTkzZWY2NjVlNGRiYyIsInJvbGVzIjpbImJ1eWVyIiwic2VsbGVyIl0sImlhdCI6MTc0MTU0MDc4MCwiZXhwIjoxNzQxNTQ0MzgwfQ.m8c56tzvbR0bVV7sNdiE2s-U_yZ8U-eQP_WJNctn4E0
+
+
+### user profile
+GET {{PORT}}/tacc/
+Content-Type: {{Json}}
+
+
+
+//? cart
+###
+POST  {{PORT}}/cart/add_to_cart
+Content-Type: {{Json}}
+Authorization :{{token}}
+
+{
+  "productId":"67cdbf55e83801eb1d5834ee"
+  # "productId":"67cdbf65e83801eb1d5834f1"
+}
+###
+PUT  {{PORT}}/cart/remove_from_cart
+Content-Type: {{Json}}
+Authorization :{{token}}
+
+{
+  "productId":"67cdbf55e83801eb1d5834ee"
+  # "productId":"67cdbf65e83801eb1d5834f1"
+}
+###
+GET  {{PORT}}/user
+###
+GET  {{PORT}}/cart/user_cart
+Content-Type: {{Json}}
+Authorization :{{token}}
+###
+DELETE  {{PORT}}/cart/67cdcfc0f23f882cab4975c8
+Content-Type: {{Json}}
+Authorization :{{token}}

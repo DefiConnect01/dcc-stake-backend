@@ -14,6 +14,7 @@ const socket_io_1 = require("socket.io");
 const allowedOrigins_1 = require("./allowedOrigins");
 const workerQueue_1 = require("../helper/workerQueue");
 require("./../utils/taccStatusUpdater");
+const TaccController_1 = require("../Controller/TaccController");
 const Apikey = process.env.Apikey;
 let io = null;
 const connectedUsers = new Map();
@@ -52,14 +53,43 @@ const initializeSocket = (httpServer) => {
         socket.on('stake', (data) => __awaiter(void 0, void 0, void 0, function* () {
             try {
                 console.log({ data }, 'listening to stake event');
-                //? push to worker
+                const normalizedAction = (0, TaccController_1.normalizeAction)(data.action);
+                if (!normalizedAction) {
+                    return socket.emit('error', { message: 'Invalid action provided' });
+                }
+                const sanitizedData = Object.assign(Object.assign({}, data), { action: normalizedAction });
+                // Push to worker
                 const savedTx = yield (0, workerQueue_1.handleJob)({
                     type: 'TacStake',
-                    data: data,
+                    data: sanitizedData,
+                });
+                console.log('Saved from worker:', savedTx);
+                io === null || io === void 0 ? void 0 : io.emit('stake:confirmation', savedTx);
+                console.log('finally back to default');
+            }
+            catch (error) {
+                if (error instanceof Error) {
+                    console.error('Error saving transaction via worker:', error);
+                    socket.emit('error', { message: error.message || 'Unknown error occurred during staking' });
+                }
+            }
+        }));
+        socket.on('unstake', (data) => __awaiter(void 0, void 0, void 0, function* () {
+            try {
+                console.log({ data }, 'listening to unstake event');
+                const normalizedAction = (0, TaccController_1.normalizeAction)(data.action);
+                if (!normalizedAction) {
+                    return socket.emit('error', { message: 'Invalid action provided' });
+                }
+                const sanitizedData = Object.assign(Object.assign({}, data), { action: normalizedAction });
+                // Push to worker
+                const savedTx = yield (0, workerQueue_1.handleJob)({
+                    type: 'TacStake',
+                    data: sanitizedData,
                 });
                 console.log('Saved from worker:', savedTx);
                 //? emit back to frontend transaction successfull
-                io === null || io === void 0 ? void 0 : io.emit('stake:confirmation', savedTx);
+                io === null || io === void 0 ? void 0 : io.emit('unstake:confirmation', savedTx);
                 console.log('finally back to default');
             }
             catch (error) {

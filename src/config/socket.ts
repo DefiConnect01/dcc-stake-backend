@@ -4,6 +4,7 @@ import { ITacc } from './../Model/TaccHistory'
 import { allowedOrigins } from "./allowedOrigins";
 import { handleJob } from "../helper/workerQueue";
 import './../utils/taccStatusUpdater'
+import { normalizeAction } from "../Controller/TaccController";
 const Apikey = process.env.Apikey;
 let io: Server | null = null;
 
@@ -50,19 +51,61 @@ export const initializeSocket = (httpServer: HttpServer): void => {
     connectedUsers.set(authenticatedSocket.userId, authenticatedSocket.id);
     //? listen to swap
     socket.on('stake', async (data) => {
-
       try {
         console.log({ data }, 'listening to stake event');
 
-        //? push to worker
+        const normalizedAction = normalizeAction(data.action);
+        if (!normalizedAction) {
+          return socket.emit('error', { message: 'Invalid action provided' });
+        }
+
+        const sanitizedData = {
+          ...data,
+          action: normalizedAction,
+        };
+
+        // Push to worker
         const savedTx = await handleJob({
           type: 'TacStake',
-          data: data,
+          data: sanitizedData,
+        });
+
+        console.log('Saved from worker:', savedTx);
+        io?.emit('stake:confirmation', savedTx);
+
+        console.log('finally back to default');
+      } catch (error) {
+        if (error instanceof Error) {
+          console.error('Error saving transaction via worker:', error);
+          socket.emit('error', { message: error.message || 'Unknown error occurred during staking' });
+        }
+      }
+    });
+
+    socket.on('unstake', async (data) => {
+
+      try {
+        console.log({ data }, 'listening to unstake event');
+
+        const normalizedAction = normalizeAction(data.action);
+        if (!normalizedAction) {
+          return socket.emit('error', { message: 'Invalid action provided' });
+        }
+
+        const sanitizedData = {
+          ...data,
+          action: normalizedAction,
+        };
+
+        // Push to worker
+        const savedTx = await handleJob({
+          type: 'TacStake',
+          data: sanitizedData,
         });
         console.log('Saved from worker:', savedTx);
         //? emit back to frontend transaction successfull
-        io?.emit('stake:confirmation', savedTx);
-       
+        io?.emit('unstake:confirmation', savedTx);
+
 
         console.log('finally back to default')
       } catch (error) {

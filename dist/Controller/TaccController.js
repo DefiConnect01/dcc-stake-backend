@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createTac = exports.getAllTacc = void 0;
+exports.createTac = exports.normalizeAction = exports.getAllTacc = void 0;
 const serviceRepository_1 = require("./serviceRepository");
 const express_async_handler_1 = __importDefault(require("express-async-handler"));
 const ResponseHandler_1 = require("../helper/ResponseHandler");
@@ -27,9 +27,23 @@ exports.getAllTacc = (0, express_async_handler_1.default)((req, res) => __awaite
         (0, ResponseHandler_1.ResponseHandler)(res, 500, 'Failed to fetch transactions', null);
     }
 }));
+const normalizeAction = (value) => {
+    const formatted = value.trim().toLowerCase();
+    if (formatted === 'stake')
+        return 'Stake';
+    if (formatted === 'unstake')
+        return 'Unstake';
+    return null;
+};
+exports.normalizeAction = normalizeAction;
 exports.createTac = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const body = req.body;
-    const tx = yield repository.createEntity(Object.assign({}, body));
+    const normalizedAction = (0, exports.normalizeAction)(body.action);
+    if (!normalizedAction) {
+        (0, ResponseHandler_1.ResponseHandler)(res, 400, 'Invalid action type', null);
+        return;
+    }
+    const tx = yield repository.createEntity(Object.assign(Object.assign({}, body), { action: normalizedAction }));
     if (tx) {
         (0, ResponseHandler_1.ResponseHandler)(res, 200, 'Transaction created successfully', tx);
     }

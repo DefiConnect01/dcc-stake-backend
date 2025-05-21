@@ -33,13 +33,15 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TaccHistoryModel = exports.IStatus = void 0;
+exports.TaccHistoryModel = exports.ACTIONS = exports.IStatus = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
+// Enums and Types
 var IStatus;
 (function (IStatus) {
     IStatus["PENDING"] = "Pending";
     IStatus["COMPLETED"] = "Completed";
 })(IStatus || (exports.IStatus = IStatus = {}));
+exports.ACTIONS = ['Stake', 'Unstake'];
 const TaccSchema = new mongoose_1.Schema({
     address: { required: true, type: String },
     token: { required: true, type: String },
@@ -47,6 +49,12 @@ const TaccSchema = new mongoose_1.Schema({
     duration: { required: true, type: String },
     network: { required: true, type: String },
     hash: { required: true, type: String },
+    action: {
+        required: true,
+        type: String,
+        enum: exports.ACTIONS,
+        default: exports.ACTIONS[0],
+    },
     status: {
         type: String,
         enum: Object.values(IStatus),

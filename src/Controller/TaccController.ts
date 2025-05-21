@@ -2,7 +2,7 @@ import { serviceRepository } from "./serviceRepository";
 import AsyncHandler from "express-async-handler";
 import { Request, Response } from "express";
 import { ResponseHandler } from "../helper/ResponseHandler";
-import { TaccHistoryModel } from "../Model/TaccHistory";
+import { IAction, TaccHistoryModel } from "../Model/TaccHistory";
 
 const repository = serviceRepository(TaccHistoryModel);
 
@@ -17,9 +17,24 @@ export const getAllTacc = AsyncHandler(async (req: Request, res: Response): Prom
 });
 
 
+export const normalizeAction = (value: string): IAction | null => {
+    const formatted = value.trim().toLowerCase();
+    if (formatted === 'stake') return 'Stake';
+    if (formatted === 'unstake') return 'Unstake';
+    return null;
+};
+
 export const createTac = AsyncHandler(async (req: Request, res: Response): Promise<void> => {
     const body = req.body;
-    const tx = await repository.createEntity({ ...body });
+
+
+    const normalizedAction = normalizeAction(body.action);
+    if (!normalizedAction) {
+        ResponseHandler(res, 400, 'Invalid action type', null);
+        return;
+    }
+
+    const tx = await repository.createEntity({ ...body, action: normalizedAction });
 
     if (tx) {
         ResponseHandler(res, 200, 'Transaction created successfully', tx);

@@ -10,5 +10,6 @@ function fotmatTac(data) {
         network: data.network,
         hash: data.hash,
         status: data.status,
+        action: data.action,
     };
 }
