@@ -14,7 +14,7 @@ const path_1 = __importDefault(require("path"));
 const socket_1 = require("./config/socket");
 const allowedOrigins_1 = require("./config/allowedOrigins");
 const TaccRoutes_1 = __importDefault(require("./Routes/TaccRoutes"));
-console.log({ path: path_1.default.join(__dirname, '../dist/workerHelper.js') });
+// console.log({path:path.join(__dirname, '../dist/workerHelper.js')})
 // console.log("UUID:", crypto.randomUUID());
 // console.log("Random Bytes (hex):", crypto.randomBytes(256).toString("hex"));
 const app = (0, express_1.default)();

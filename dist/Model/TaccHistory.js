@@ -35,7 +35,6 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TaccHistoryModel = exports.ACTIONS = exports.IStatus = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
-// Enums and Types
 var IStatus;
 (function (IStatus) {
     IStatus["PENDING"] = "Pending";

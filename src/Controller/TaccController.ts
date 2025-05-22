@@ -3,18 +3,22 @@ import AsyncHandler from "express-async-handler";
 import { Request, Response } from "express";
 import { ResponseHandler } from "../helper/ResponseHandler";
 import { IAction, TaccHistoryModel } from "../Model/TaccHistory";
+import { formatTac } from "../utils/formatTac";
 
 const repository = serviceRepository(TaccHistoryModel);
 
 export const getAllTacc = AsyncHandler(async (req: Request, res: Response): Promise<void> => {
     const tx = await repository.getAll();
     
-    if (tx) {
-        ResponseHandler(res, 200, 'Success', tx);
+    if (tx && Array.isArray(tx)) {
+        // console.log(tx);
+        const result = tx.map((ab) => formatTac(ab));
+        ResponseHandler(res, 200, 'Success', result); 
     } else {
         ResponseHandler(res, 500, 'Failed to fetch transactions', null);
     }
 });
+
 
 
 export const normalizeAction = (value: string): IAction | null => {

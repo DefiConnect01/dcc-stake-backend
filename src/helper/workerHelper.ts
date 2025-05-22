@@ -3,7 +3,7 @@ import { parentPort } from 'worker_threads';
 import { connectDb } from '../config/db';
 import { TransactionModel } from '../Model/transaction';
 import { TaccHistoryModel } from './../Model/TaccHistory'
-import { fotmatTac } from '../utils/formatTac';
+import { formatTac } from '../utils/formatTac';
 
 const saveTransaction = async <T extends Document>(
   SchemaType: Model<T>,
@@ -56,7 +56,7 @@ parentPort?.on('message', async (message: any) => {
         console.log(JSON.stringify(stackTacc, null, 2))
         console.log("Sending to worker:", JSON.stringify(data));
         console.log(JSON.stringify(stackTacc, null, 2));
-        const tacResult = fotmatTac(stackTacc)
+        const tacResult = formatTac(stackTacc)
         console.log({ tacResult })
         parentPort?.postMessage({ status: 'success', txData: tacResult });
         console.log('Transaction saved and data sent back to main thread:', stackTacc);

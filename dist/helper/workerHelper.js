@@ -61,7 +61,7 @@ worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ?
                 console.log(JSON.stringify(stackTacc, null, 2));
                 console.log("Sending to worker:", JSON.stringify(data));
                 console.log(JSON.stringify(stackTacc, null, 2));
-                const tacResult = (0, formatTac_1.fotmatTac)(stackTacc);
+                const tacResult = (0, formatTac_1.formatTac)(stackTacc);
                 console.log({ tacResult });
                 worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage({ status: 'success', txData: tacResult });
                 console.log('Transaction saved and data sent back to main thread:', stackTacc);

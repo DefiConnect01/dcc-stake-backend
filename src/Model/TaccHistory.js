@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TaccHistoryModel = exports.ACTIONS = exports.IStatus = void 0;
 var mongoose_1 = require("mongoose");
-// Enums and Types
 var IStatus;
 (function (IStatus) {
     IStatus["PENDING"] = "Pending";

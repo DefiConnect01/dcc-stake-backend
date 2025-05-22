@@ -17,11 +17,14 @@ const serviceRepository_1 = require("./serviceRepository");
 const express_async_handler_1 = __importDefault(require("express-async-handler"));
 const ResponseHandler_1 = require("../helper/ResponseHandler");
 const TaccHistory_1 = require("../Model/TaccHistory");
+const formatTac_1 = require("../utils/formatTac");
 const repository = (0, serviceRepository_1.serviceRepository)(TaccHistory_1.TaccHistoryModel);
 exports.getAllTacc = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const tx = yield repository.getAll();
-    if (tx) {
-        (0, ResponseHandler_1.ResponseHandler)(res, 200, 'Success', tx);
+    if (tx && Array.isArray(tx)) {
+        // console.log(tx);
+        const result = tx.map((ab) => (0, formatTac_1.formatTac)(ab));
+        (0, ResponseHandler_1.ResponseHandler)(res, 200, 'Success', result);
     }
     else {
         (0, ResponseHandler_1.ResponseHandler)(res, 500, 'Failed to fetch transactions', null);

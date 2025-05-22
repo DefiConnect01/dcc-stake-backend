@@ -1,6 +1,5 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 
-// Enums and Types
 export enum IStatus {
     PENDING = "Pending",
     COMPLETED = "Completed",
