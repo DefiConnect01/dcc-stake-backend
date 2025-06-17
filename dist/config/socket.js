@@ -15,6 +15,7 @@ const allowedOrigins_1 = require("./allowedOrigins");
 const workerQueue_1 = require("../helper/workerQueue");
 require("./../utils/taccStatusUpdater");
 const TaccController_1 = require("../Controller/TaccController");
+const cache_1 = require("./cache");
 const Apikey = process.env.Apikey;
 let io = null;
 const connectedUsers = new Map();
@@ -50,52 +51,57 @@ const initializeSocket = (httpServer) => {
         console.log(`User connected with socket id: ${authenticatedSocket.id}`);
         connectedUsers.set(authenticatedSocket.userId, authenticatedSocket.id);
         //? listen to swap
-        socket.on('stake', (data) => __awaiter(void 0, void 0, void 0, function* () {
+        socket.on("stake", (data) => __awaiter(void 0, void 0, void 0, function* () {
             try {
-                console.log({ data }, 'listening to stake event');
+                console.log({ data }, "listening to stake event");
                 const normalizedAction = (0, TaccController_1.normalizeAction)(data.action);
                 if (!normalizedAction) {
-                    return socket.emit('error', { message: 'Invalid action provided' });
+                    return socket.emit("error", { message: "Invalid action provided" });
                 }
                 const sanitizedData = Object.assign(Object.assign({}, data), { action: normalizedAction });
                 // Push to worker
                 const savedTx = yield (0, workerQueue_1.handleJob)({
-                    type: 'TacStake',
+                    type: "TacStake",
                     data: sanitizedData,
                 });
-                console.log('Saved from worker:', savedTx);
-                io === null || io === void 0 ? void 0 : io.emit('stake:confirmation', savedTx);
-                console.log('finally back to default');
+                cache_1.cache.del("tac:list");
+                console.log("Saved from worker:", savedTx);
+                io === null || io === void 0 ? void 0 : io.emit("stake:confirmation", savedTx);
+                console.log("finally back to default");
             }
             catch (error) {
                 if (error instanceof Error) {
-                    console.error('Error saving transaction via worker:', error);
-                    socket.emit('error', { message: error.message || 'Unknown error occurred during staking' });
+                    console.error("Error saving transaction via worker:", error);
+                    socket.emit("error", {
+                        message: error.message || "Unknown error occurred during staking",
+                    });
                 }
             }
         }));
-        socket.on('unstake', (data) => __awaiter(void 0, void 0, void 0, function* () {
+        socket.on("unstake", (data) => __awaiter(void 0, void 0, void 0, function* () {
             try {
-                console.log({ data }, 'listening to unstake event');
+                console.log({ data }, "listening to unstake event");
                 const normalizedAction = (0, TaccController_1.normalizeAction)(data.action);
                 if (!normalizedAction) {
-                    return socket.emit('error', { message: 'Invalid action provided' });
+                    return socket.emit("error", { message: "Invalid action provided" });
                 }
                 const sanitizedData = Object.assign(Object.assign({}, data), { action: normalizedAction });
                 // Push to worker
                 const savedTx = yield (0, workerQueue_1.handleJob)({
-                    type: 'TacStake',
+                    type: "TacStake",
                     data: sanitizedData,
                 });
-                console.log('Saved from worker:', savedTx);
+                console.log("Saved from worker:", savedTx);
                 //? emit back to frontend transaction successfull
-                io === null || io === void 0 ? void 0 : io.emit('unstake:confirmation', savedTx);
-                console.log('finally back to default');
+                io === null || io === void 0 ? void 0 : io.emit("unstake:confirmation", savedTx);
+                console.log("finally back to default");
             }
             catch (error) {
                 if (error instanceof Error) {
-                    console.error('Error saving transaction via worker:', error);
-                    socket.emit('error', { message: error.message || 'Unknown error occurred during staking' });
+                    console.error("Error saving transaction via worker:", error);
+                    socket.emit("error", {
+                        message: error.message || "Unknown error occurred during staking",
+                    });
                 }
             }
         }));

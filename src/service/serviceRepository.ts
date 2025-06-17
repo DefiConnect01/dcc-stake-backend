@@ -5,7 +5,7 @@ export const serviceRepository = <T extends Document>(schema: Model<T>) => ({
     try {
       return await schema.create(entity);
     } catch (error) {
-      throw new Error(error instanceof Error ? error.message : 'Create failed');
+      throw new Error(error instanceof Error ? error.message : "Create failed");
     }
   },
 
@@ -13,7 +13,9 @@ export const serviceRepository = <T extends Document>(schema: Model<T>) => ({
     try {
       return await schema.find().sort({ createdAt: -1 });
     } catch (error) {
-      throw new Error(error instanceof Error ? error.message : 'Get all failed');
+      throw new Error(
+        error instanceof Error ? error.message : "Get all failed"
+      );
     }
   },
 
@@ -24,7 +26,9 @@ export const serviceRepository = <T extends Document>(schema: Model<T>) => ({
     try {
       return await schema.findById(id);
     } catch (error) {
-      throw new Error(error instanceof Error ? error.message : 'Get by ID failed');
+      throw new Error(
+        error instanceof Error ? error.message : "Get by ID failed"
+      );
     }
   },
 
@@ -32,18 +36,23 @@ export const serviceRepository = <T extends Document>(schema: Model<T>) => ({
     try {
       return await schema.findOne(query);
     } catch (error) {
-      throw new Error(error instanceof Error ? error.message : 'Get one failed');
+      throw new Error(
+        error instanceof Error ? error.message : "Get one failed"
+      );
     }
   },
 
-  updateSingle: async (id: string, updateData: UpdateQuery<T>): Promise<T | null> => {
+  updateSingle: async (
+    id: string,
+    updateData: UpdateQuery<T>
+  ): Promise<T | null> => {
     if (!mongoose.isValidObjectId(id)) {
       throw new Error("Not a valid ID");
     }
     try {
       return await schema.findByIdAndUpdate(id, updateData, { new: true });
     } catch (error) {
-      throw new Error(error instanceof Error ? error.message : 'Update failed');
+      throw new Error(error instanceof Error ? error.message : "Update failed");
     }
   },
 
@@ -54,7 +63,7 @@ export const serviceRepository = <T extends Document>(schema: Model<T>) => ({
     try {
       return await schema.findByIdAndDelete(id);
     } catch (error) {
-      throw new Error(error instanceof Error ? error.message : 'Delete failed');
+      throw new Error(error instanceof Error ? error.message : "Delete failed");
     }
   },
 });

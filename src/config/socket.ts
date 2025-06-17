@@ -1,10 +1,11 @@
 import { Server, Socket } from "socket.io";
 import { Server as HttpServer } from "http";
-import { ITacc } from './../Model/TaccHistory'
+import { ITacc } from "./../Model/TaccHistory";
 import { allowedOrigins } from "./allowedOrigins";
 import { handleJob } from "../helper/workerQueue";
-import './../utils/taccStatusUpdater'
+import "./../utils/taccStatusUpdater";
 import { normalizeAction } from "../Controller/TaccController";
+import { cache } from "./cache";
 const Apikey = process.env.Apikey;
 let io: Server | null = null;
 
@@ -45,18 +46,18 @@ export const initializeSocket = (httpServer: HttpServer): void => {
 
   io.on("connection", (socket: Socket) => {
     const authenticatedSocket = socket as AuthenticatedSocket;
-    console.log({ socket: socket.id })
+    console.log({ socket: socket.id });
 
     console.log(`User connected with socket id: ${authenticatedSocket.id}`);
     connectedUsers.set(authenticatedSocket.userId, authenticatedSocket.id);
     //? listen to swap
-    socket.on('stake', async (data) => {
+    socket.on("stake", async (data) => {
       try {
-        console.log({ data }, 'listening to stake event');
+        console.log({ data }, "listening to stake event");
 
         const normalizedAction = normalizeAction(data.action);
         if (!normalizedAction) {
-          return socket.emit('error', { message: 'Invalid action provided' });
+          return socket.emit("error", { message: "Invalid action provided" });
         }
 
         const sanitizedData = {
@@ -66,30 +67,31 @@ export const initializeSocket = (httpServer: HttpServer): void => {
 
         // Push to worker
         const savedTx = await handleJob({
-          type: 'TacStake',
+          type: "TacStake",
           data: sanitizedData,
         });
+        cache.del("tac:list");
+        console.log("Saved from worker:", savedTx);
+        io?.emit("stake:confirmation", savedTx);
 
-        console.log('Saved from worker:', savedTx);
-        io?.emit('stake:confirmation', savedTx);
-
-        console.log('finally back to default');
+        console.log("finally back to default");
       } catch (error) {
         if (error instanceof Error) {
-          console.error('Error saving transaction via worker:', error);
-          socket.emit('error', { message: error.message || 'Unknown error occurred during staking' });
+          console.error("Error saving transaction via worker:", error);
+          socket.emit("error", {
+            message: error.message || "Unknown error occurred during staking",
+          });
         }
       }
     });
 
-    socket.on('unstake', async (data) => {
-
+    socket.on("unstake", async (data) => {
       try {
-        console.log({ data }, 'listening to unstake event');
+        console.log({ data }, "listening to unstake event");
 
         const normalizedAction = normalizeAction(data.action);
         if (!normalizedAction) {
-          return socket.emit('error', { message: 'Invalid action provided' });
+          return socket.emit("error", { message: "Invalid action provided" });
         }
 
         const sanitizedData = {
@@ -99,22 +101,23 @@ export const initializeSocket = (httpServer: HttpServer): void => {
 
         // Push to worker
         const savedTx = await handleJob({
-          type: 'TacStake',
+          type: "TacStake",
           data: sanitizedData,
         });
-        console.log('Saved from worker:', savedTx);
+        console.log("Saved from worker:", savedTx);
         //? emit back to frontend transaction successfull
-        io?.emit('unstake:confirmation', savedTx);
+        io?.emit("unstake:confirmation", savedTx);
 
-
-        console.log('finally back to default')
+        console.log("finally back to default");
       } catch (error) {
         if (error instanceof Error) {
-          console.error('Error saving transaction via worker:', error);
-          socket.emit('error', { message: error.message || 'Unknown error occurred during staking' });
+          console.error("Error saving transaction via worker:", error);
+          socket.emit("error", {
+            message: error.message || "Unknown error occurred during staking",
+          });
         }
       }
-    })
+    });
 
     //?
     //? listen to message

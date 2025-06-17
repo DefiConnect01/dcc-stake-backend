@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const TaccController_1 = require("../Controller/TaccController");
+const checkCache_1 = require("../Middleware/checkCache");
 const router = express_1.default.Router();
-router.get("/tacc", TaccController_1.getAllTacc);
+router.get("/tacc", (0, checkCache_1.checkCache)(req => `tac:list`), TaccController_1.getAllTacc);
 exports.default = router;

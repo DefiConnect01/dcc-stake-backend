@@ -13,7 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createTransactions = exports.getAllTransactions = void 0;
-const serviceRepository_1 = require("./serviceRepository");
+const serviceRepository_1 = require("../service/serviceRepository");
 const transaction_1 = require("../Model/transaction");
 const express_async_handler_1 = __importDefault(require("express-async-handler"));
 const ResponseHandler_1 = require("../helper/ResponseHandler");
@@ -21,19 +21,19 @@ const repository = (0, serviceRepository_1.serviceRepository)(transaction_1.Tran
 exports.getAllTransactions = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const tx = yield repository.getAll();
     if (tx) {
-        (0, ResponseHandler_1.ResponseHandler)(res, 200, 'Success', tx);
+        (0, ResponseHandler_1.ResponseHandler)(res, 200, "Success", tx);
     }
     else {
-        (0, ResponseHandler_1.ResponseHandler)(res, 500, 'Failed to fetch transactions', null);
+        (0, ResponseHandler_1.ResponseHandler)(res, 500, "Failed to fetch transactions", null);
     }
 }));
 exports.createTransactions = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const body = req.body;
     const tx = yield repository.createEntity(Object.assign({}, body));
     if (tx) {
-        (0, ResponseHandler_1.ResponseHandler)(res, 200, 'Transaction created successfully', tx);
+        (0, ResponseHandler_1.ResponseHandler)(res, 200, "Transaction created successfully", tx);
     }
     else {
-        (0, ResponseHandler_1.ResponseHandler)(res, 500, 'Failed to create transaction', null);
+        (0, ResponseHandler_1.ResponseHandler)(res, 500, "Failed to create transaction", null);
     }
 }));

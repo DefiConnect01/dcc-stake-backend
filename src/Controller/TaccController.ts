@@ -1,48 +1,57 @@
-import { serviceRepository } from "./serviceRepository";
+import { serviceRepository } from "../service/serviceRepository";
 import AsyncHandler from "express-async-handler";
 import { Request, Response } from "express";
 import { ResponseHandler } from "../helper/ResponseHandler";
 import { IAction, TaccHistoryModel } from "../Model/TaccHistory";
 import { formatTac } from "../utils/formatTac";
+import { cache } from "../config/cache";
+import { CacheRequest } from "../Middleware/checkCache";
 
 const repository = serviceRepository(TaccHistoryModel);
 
-export const getAllTacc = AsyncHandler(async (req: Request, res: Response): Promise<void> => {
+export const getAllTacc = AsyncHandler(
+  async (req: CacheRequest, res: Response): Promise<void> => {
     const tx = await repository.getAll();
-    
+
     if (tx && Array.isArray(tx)) {
-        // console.log(tx);
-        const result = tx.map((ab) => formatTac(ab));
-        ResponseHandler(res, 200, 'Success', result); 
+      // console.log(tx);
+      const result = tx.map((ab) => formatTac(ab));
+      if (req.cacheKey) {
+        cache.set(req.cacheKey, result, 600);
+      }
+      ResponseHandler(res, 200, "Success", result);
     } else {
-        ResponseHandler(res, 500, 'Failed to fetch transactions', null);
+      ResponseHandler(res, 500, "Failed to fetch transactions", null);
     }
-});
-
-
+  }
+);
 
 export const normalizeAction = (value: string): IAction | null => {
-    const formatted = value.trim().toLowerCase();
-    if (formatted === 'stake') return 'Stake';
-    if (formatted === 'unstake') return 'Unstake';
-    return null;
+  const formatted = value.trim().toLowerCase();
+  if (formatted === "stake") return "Stake";
+  if (formatted === "unstake") return "Unstake";
+  return null;
 };
 
-export const createTac = AsyncHandler(async (req: Request, res: Response): Promise<void> => {
+export const createTac = AsyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
     const body = req.body;
-
 
     const normalizedAction = normalizeAction(body.action);
     if (!normalizedAction) {
-        ResponseHandler(res, 400, 'Invalid action type', null);
-        return;
+      ResponseHandler(res, 400, "Invalid action type", null);
+      return;
     }
 
-    const tx = await repository.createEntity({ ...body, action: normalizedAction });
+    const tx = await repository.createEntity({
+      ...body,
+      action: normalizedAction,
+    });
 
     if (tx) {
-        ResponseHandler(res, 200, 'Transaction created successfully', tx);
+      ResponseHandler(res, 200, "Transaction created successfully", tx);
     } else {
-        ResponseHandler(res, 500, 'Failed to create transaction', null);
+      ResponseHandler(res, 500, "Failed to create transaction", null);
     }
-});
+  }
+);
