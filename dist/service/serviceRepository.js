@@ -23,9 +23,14 @@ const serviceRepository = (schema) => ({
             throw new Error(error instanceof Error ? error.message : "Create failed");
         }
     }),
-    getAll: () => __awaiter(void 0, void 0, void 0, function* () {
+    getAll: (options) => __awaiter(void 0, void 0, void 0, function* () {
+        const { skip = 0, limit = 20 } = options || {};
         try {
-            return yield schema.find().sort({ createdAt: -1 });
+            return yield schema
+                .find()
+                .skip(skip)
+                .limit(limit)
+                .sort({ createdAt: -1 });
         }
         catch (error) {
             throw new Error(error instanceof Error ? error.message : "Get all failed");

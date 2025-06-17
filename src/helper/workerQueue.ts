@@ -54,9 +54,9 @@ const runWorker = (data: JobMessage): Promise<any> => {
     activeWorkers++;
 
     // const worker = new Worker(path.join(__dirname, '../helper/workerHelper.js'));
-    console.log({path:path.join(__dirname, '../dist/workerHelper.js')})
-    console.log({path:path.join(__dirname, '/dist/helper/workerHelper.js')})
-    console.log({path:path.join(__dirname, '/workerHelper.js')},'we are here')
+    // console.log({path:path.join(__dirname, '../dist/workerHelper.js')})
+    // console.log({path:path.join(__dirname, '/dist/helper/workerHelper.js')})
+    // console.log({path:path.join(__dirname, '/workerHelper.js')},'we are here')
     // const worker = new Worker(path.join(__dirname, '../dist/workerHelper.js'));
     const worker = new Worker(path.join(__dirname, '/workerHelper.js'));
     // const worker = new Worker(path.join(__dirname, '../helper/dist/workerHelper.js'));

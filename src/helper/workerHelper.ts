@@ -11,10 +11,8 @@ const saveTransaction = async <T extends Document>(
 ): Promise<T> => {
   try {
     const savedTransaction = await SchemaType.create(transactionData);
-    console.log('Transaction saved to DB:', savedTransaction);
     return savedTransaction;
   } catch (error) {
-    console.error('Error saving transaction to DB in worker:', error);
     throw error;
   }
 };
@@ -28,41 +26,26 @@ const saveTransaction = async <T extends Document>(
 (async () => {
   try {
     await connectDb();
-    console.log('Database connected in worker');
   } catch (error: any) {
-    console.error('Error during worker initialization:', error);
     parentPort?.postMessage({ status: 'error', error: error.message });
   }
 })();
 
 parentPort?.on('message', async (message: any) => {
   const { type, data } = message;
-  console.log('Message received in worker:', type, data);
 
   try {
     switch (type) {
       case 'saveTransaction':
-        console.log('saveTransaction')
         const savedTransaction = await saveTransaction(TransactionModel, data);
-        console.log('saveTransaction 2')
         parentPort?.postMessage({ status: 'success', txData: savedTransaction });
-        console.log('Transaction saved and data sent back to main thread:', savedTransaction);
         break;
       case 'TacStake':
-        console.log('TacStake')
         const stackTacc = await saveTransaction(TaccHistoryModel, data);
-        console.log('TacStake 1')
-        console.log({ stackTacc })
-        console.log(JSON.stringify(stackTacc, null, 2))
-        console.log("Sending to worker:", JSON.stringify(data));
-        console.log(JSON.stringify(stackTacc, null, 2));
         const tacResult = formatTac(stackTacc)
-        console.log({ tacResult })
         parentPort?.postMessage({ status: 'success', txData: tacResult });
-        console.log('Transaction saved and data sent back to main thread:', stackTacc);
         break;
       case 'sendEmail':
-        console.log('send email')
         // await sendEmailFunction(data);
         parentPort?.postMessage({ status: 'success', txData: 'Email sent' });
         break;
@@ -72,7 +55,6 @@ parentPort?.on('message', async (message: any) => {
         break;
     }
   } catch (error: any) {
-    console.error('Error handling message:', error);
     parentPort?.postMessage({ status: 'error', error: error.message });
   }
 });
