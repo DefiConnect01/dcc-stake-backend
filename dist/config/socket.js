@@ -64,7 +64,7 @@ const initializeSocket = (httpServer) => {
                     type: "TacStake",
                     data: sanitizedData,
                 });
-                cache_1.cache.del("tac:list");
+                (0, cache_1.clearCacheByPrefix)("tac:list");
                 console.log("Saved from worker:", savedTx);
                 io === null || io === void 0 ? void 0 : io.emit("stake:confirmation", savedTx);
                 console.log("finally back to default");

@@ -20,10 +20,13 @@ const TaccHistory_1 = require("../Model/TaccHistory");
 const formatTac_1 = require("../utils/formatTac");
 const cache_1 = require("../config/cache");
 const repository = (0, serviceRepository_1.serviceRepository)(TaccHistory_1.TaccHistoryModel);
+// GET /api/transactions?page=2&limit=20
 exports.getAllTacc = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const tx = yield repository.getAll();
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
+    const tx = yield repository.getAll({ skip, limit });
     if (tx && Array.isArray(tx)) {
-        // console.log(tx);
         const result = tx.map((ab) => (0, formatTac_1.formatTac)(ab));
         if (req.cacheKey) {
             cache_1.cache.set(req.cacheKey, result, 600);
@@ -52,6 +55,7 @@ exports.createTac = (0, express_async_handler_1.default)((req, res) => __awaiter
     }
     const tx = yield repository.createEntity(Object.assign(Object.assign({}, body), { action: normalizedAction }));
     if (tx) {
+        (0, cache_1.clearCacheByPrefix)("tac:list");
         (0, ResponseHandler_1.ResponseHandler)(res, 200, "Transaction created successfully", tx);
     }
     else {

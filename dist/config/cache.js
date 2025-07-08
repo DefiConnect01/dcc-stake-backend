@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.cache = void 0;
+exports.clearCacheByPrefix = exports.cache = void 0;
 exports.setCache = setCache;
 exports.invalidateCache = invalidateCache;
 const node_cache_1 = __importDefault(require("node-cache"));
@@ -33,4 +33,9 @@ function invalidateCache(keys) {
         console.log(`Cache invalidated for ${key}`);
     });
 }
+const clearCacheByPrefix = (prefix) => {
+    const keys = exports.cache.keys().filter((key) => key.startsWith(prefix));
+    keys.forEach((key) => exports.cache.del(key));
+};
+exports.clearCacheByPrefix = clearCacheByPrefix;
 // invalidateCache([`products-${productId}`, "all-products"]);

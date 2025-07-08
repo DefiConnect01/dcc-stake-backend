@@ -1,5 +1,5 @@
-# @PORT = http://localhost:3000/api
-@PORT = https://abundance-server.onrender.com/api
+@PORT = http://localhost:3000/api
+# @PORT = https://abundance-server.onrender.com/api
 @Json = application/json
 
 
@@ -7,7 +7,7 @@
 
 
 ### user profile
-GET {{PORT}}/tacc/
+GET {{PORT}}/tacc
 Content-Type: {{Json}}
 
 

@@ -5,7 +5,7 @@ import { allowedOrigins } from "./allowedOrigins";
 import { handleJob } from "../helper/workerQueue";
 import "./../utils/taccStatusUpdater";
 import { normalizeAction } from "../Controller/TaccController";
-import { cache } from "./cache";
+import { cache, clearCacheByPrefix } from "./cache";
 const Apikey = process.env.Apikey;
 let io: Server | null = null;
 
@@ -70,7 +70,7 @@ export const initializeSocket = (httpServer: HttpServer): void => {
           type: "TacStake",
           data: sanitizedData,
         });
-        cache.del("tac:list");
+ clearCacheByPrefix("tac:list");
         console.log("Saved from worker:", savedTx);
         io?.emit("stake:confirmation", savedTx);
 

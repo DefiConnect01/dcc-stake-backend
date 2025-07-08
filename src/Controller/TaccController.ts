@@ -4,17 +4,20 @@ import { Request, Response } from "express";
 import { ResponseHandler } from "../helper/ResponseHandler";
 import { IAction, TaccHistoryModel } from "../Model/TaccHistory";
 import { formatTac } from "../utils/formatTac";
-import { cache } from "../config/cache";
+import { cache, clearCacheByPrefix } from "../config/cache";
 import { CacheRequest } from "../Middleware/checkCache";
 
 const repository = serviceRepository(TaccHistoryModel);
 
+// GET /api/transactions?page=2&limit=20
 export const getAllTacc = AsyncHandler(
   async (req: CacheRequest, res: Response): Promise<void> => {
-    const tx = await repository.getAll();
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 20;
+    const skip = (page - 1) * limit;
+    const tx = await repository.getAll({ skip, limit });
 
     if (tx && Array.isArray(tx)) {
-      // console.log(tx);
       const result = tx.map((ab) => formatTac(ab));
       if (req.cacheKey) {
         cache.set(req.cacheKey, result, 600);
@@ -49,6 +52,7 @@ export const createTac = AsyncHandler(
     });
 
     if (tx) {
+      clearCacheByPrefix("tac:list");
       ResponseHandler(res, 200, "Transaction created successfully", tx);
     } else {
       ResponseHandler(res, 500, "Failed to create transaction", null);

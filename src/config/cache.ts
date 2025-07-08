@@ -27,5 +27,9 @@ export function invalidateCache(keys: string | string[]): void {
   });
 }
 
+export const clearCacheByPrefix = (prefix: string) => {
+  const keys = cache.keys().filter((key) => key.startsWith(prefix));
+  keys.forEach((key) => cache.del(key));
+};
 
 // invalidateCache([`products-${productId}`, "all-products"]);
