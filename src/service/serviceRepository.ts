@@ -9,19 +9,23 @@ export const serviceRepository = <T extends Document>(schema: Model<T>) => ({
     }
   },
 
-getAll: async (options?: { skip?: number; limit?: number }): Promise<T[]> => {
-  const { skip = 0, limit = 20 } = options || {};
-  try {
-    return await schema
-      .find()
-      .skip(skip)
-      .limit(limit)
-      .sort({ createdAt: -1 });
-  } catch (error) {
-    throw new Error(error instanceof Error ? error.message : "Get all failed");
-  }
-},
-
+  getAll: async (options?: {
+    skip?: number;
+    limit?: number;
+  }): Promise<{ data: T[]; total: number }> => {
+    const { skip = 0, limit = 20 } = options || {};
+    try {
+      const [data, total] = await Promise.all([
+        schema.find().skip(skip).limit(limit).sort({ createdAt: -1 }),
+        schema.countDocuments(),
+      ]);
+      return { data, total };
+    } catch (error) {
+      throw new Error(
+        error instanceof Error ? error.message : "Get all failed"
+      );
+    }
+  },
 
   getSingleById: async (id: string): Promise<T | null> => {
     if (!mongoose.isValidObjectId(id)) {

@@ -10,22 +10,29 @@ import { CacheRequest } from "../Middleware/checkCache";
 const repository = serviceRepository(TaccHistoryModel);
 
 // GET /api/transactions?page=2&limit=20
+
 export const getAllTacc = AsyncHandler(
   async (req: CacheRequest, res: Response): Promise<void> => {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 20;
     const skip = (page - 1) * limit;
-    const tx = await repository.getAll({ skip, limit });
 
-    if (tx && Array.isArray(tx)) {
-      const result = tx.map((ab) => formatTac(ab));
-      if (req.cacheKey) {
-        cache.set(req.cacheKey, result, 600);
-      }
-      ResponseHandler(res, 200, "Success", result);
-    } else {
-      ResponseHandler(res, 500, "Failed to fetch transactions", null);
+    const { data, total } = await repository.getAll({ skip, limit });
+
+    const result = data.map((ab) => formatTac(ab));
+    const responsePayload = {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+      items: result,
+    };
+
+    if (req.cacheKey) {
+      cache.set(req.cacheKey, responsePayload, 600);
     }
+
+    ResponseHandler(res, 200, "Success", responsePayload);
   }
 );
 
