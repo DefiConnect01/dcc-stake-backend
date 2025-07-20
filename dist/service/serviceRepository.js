@@ -26,11 +26,11 @@ const serviceRepository = (schema) => ({
     getAll: (options) => __awaiter(void 0, void 0, void 0, function* () {
         const { skip = 0, limit = 20 } = options || {};
         try {
-            return yield schema
-                .find()
-                .skip(skip)
-                .limit(limit)
-                .sort({ createdAt: -1 });
+            const [data, total] = yield Promise.all([
+                schema.find().skip(skip).limit(limit).sort({ createdAt: -1 }),
+                schema.countDocuments(),
+            ]);
+            return { data, total };
         }
         catch (error) {
             throw new Error(error instanceof Error ? error.message : "Get all failed");

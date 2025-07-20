@@ -8,8 +8,8 @@ const TaccController_1 = require("../Controller/TaccController");
 const checkCache_1 = require("../Middleware/checkCache");
 const router = express_1.default.Router();
 router.get("/tacc", (0, checkCache_1.checkCache)((req) => {
-    const page = req.query.page || "1";
-    const limit = req.query.limit || "20";
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.max(1, parseInt(req.query.limit) || 10);
     return `tac:list:page=${page}:limit=${limit}`;
 }), TaccController_1.getAllTacc);
 exports.default = router;

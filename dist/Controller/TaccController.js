@@ -25,17 +25,19 @@ exports.getAllTacc = (0, express_async_handler_1.default)((req, res) => __awaite
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 20;
     const skip = (page - 1) * limit;
-    const tx = yield repository.getAll({ skip, limit });
-    if (tx && Array.isArray(tx)) {
-        const result = tx.map((ab) => (0, formatTac_1.formatTac)(ab));
-        if (req.cacheKey) {
-            cache_1.cache.set(req.cacheKey, result, 600);
-        }
-        (0, ResponseHandler_1.ResponseHandler)(res, 200, "Success", result);
+    const { data, total } = yield repository.getAll({ skip, limit });
+    const result = data.map((ab) => (0, formatTac_1.formatTac)(ab));
+    const responsePayload = {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+        items: result,
+    };
+    if (req.cacheKey) {
+        cache_1.cache.set(req.cacheKey, responsePayload, 600);
     }
-    else {
-        (0, ResponseHandler_1.ResponseHandler)(res, 500, "Failed to fetch transactions", null);
-    }
+    (0, ResponseHandler_1.ResponseHandler)(res, 200, "Success", responsePayload);
 }));
 const normalizeAction = (value) => {
     const formatted = value.trim().toLowerCase();
