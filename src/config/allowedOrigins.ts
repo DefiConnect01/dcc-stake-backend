@@ -3,4 +3,5 @@ export const allowedOrigins = [
     "http://localhost:5173",
     "https://abundance-staking.vercel.app",
     "https://staking.theabundancecoin.com",
+    "https://staking.deficonnectcredit.xyz"
   ];

@@ -1,6 +1,6 @@
 import { serviceRepository } from "../service/serviceRepository";
 import AsyncHandler from "express-async-handler";
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import { ResponseHandler } from "../helper/ResponseHandler";
 import { IAction, TaccHistoryModel } from "../Model/TaccHistory";
 import { formatTac } from "../utils/formatTac";
@@ -12,7 +12,7 @@ const repository = serviceRepository(TaccHistoryModel);
 // GET /api/transactions?page=2&limit=20
 
 export const getAllTacc = AsyncHandler(
-  async (req: CacheRequest, res: Response): Promise<void> => {
+  async (req: CacheRequest, res: Response, next: NextFunction): Promise<void> => {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 20;
     const skip = (page - 1) * limit;
